@@ -27,3 +27,7 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
 ]
 
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://django-rest-starter-production-1373.up.railway.app',
+]
+
