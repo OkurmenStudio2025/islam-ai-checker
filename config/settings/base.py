@@ -24,11 +24,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'drf_yasg',
-
-    #apps
-
-
+    'apps.group',
+    'apps.homework'
 ]
 
 MIDDLEWARE = [
@@ -87,21 +84,33 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # --- DRF ---
 REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ],
 }
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Islam AI Checker',
+    'DESCRIPTION': 'AI система для проверки домашних заданий',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SWAGGER_UI_DIST': 'SIDECAR',  # 🔑 это говорит использовать встроенный шаблон
+}
+
 
 from .cors import *
 
 JAZZMIN_SETTINGS = {
-    "site_title": "HeartVibe",  # Заголовок сайта
-    "site_header": "Админка HeartVibe",  # Заголовок на главной странице админки
-    "site_brand": "HeartVibe",  # Логотип или название бренда на странице
-    "welcome_sign": "Добро пожаловать в админку HeartVibe!",  # Приветственное сообщение
+    "site_title": "Islam Ai Checker",  # Заголовок сайта
+    "site_header": 
+        "Админка Islam Ai Checker",  # Заголовок на главной странице админки
+    "site_brand": "Islam Ai Checker",  # Логотип или название бренда на странице
+    "welcome_sign":
+        "Добро пожаловать в админку Islam Ai Checker!",  # Приветственное сообщение
     "topmenu_links": [
-        {"name": "Главная", "url": "/admin/", "permissions": ["auth.view_user"]},
+        {"name": "Главная", "url": "/admin/",
+         "permissions": ["auth.view_user"]},
     ],
     "show_ui_builder": True,
 
