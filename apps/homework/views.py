@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from .serializers import HomeworkResultsSerializer
-from .models import HomeworkResult  # убедись, что эта модель подключена
+from .models import HomeworkResults  # убедись, что эта модель подключена
 from .services.homework_checker import sent_prompt_and_get_response, extract_grade_from_feedback
 
 
@@ -67,6 +67,6 @@ class HomeworkReviewCreateAPIView(APIView):
         if pk is None:
             return Response({'error': 'Не указан ID'}, status=status.HTTP_400_BAD_REQUEST)
 
-        result = get_object_or_404(HomeworkResult, pk=pk)
+        result = get_object_or_404(HomeworkResults, pk=pk)
         serializer = HomeworkResultsSerializer(result)
         return Response(serializer.data)
