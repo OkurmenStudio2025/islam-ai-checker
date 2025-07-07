@@ -1,27 +1,26 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.shortcuts import get_object_or_404
 from .serializers import HomeworkResultsSerializer
+from .models import HomeworkResult  # убедись, что эта модель подключена
 from .services.homework_checker import sent_prompt_and_get_response, extract_grade_from_feedback
 
 
 class HomeworkReviewCreateAPIView(APIView):
     def post(self, request):
-        # Получаем данные из запроса
         student_name = request.data.get('student_name')
-        group = request.data.get('group')  # предполагается ID
+        group = request.data.get('group')
         task_title = request.data.get('task_title')
         task_condition = request.data.get('task_condition')
         student_answer = request.data.get('student_answer')
 
-        # Проверка всех обязательных полей
         if not all([student_name, group, task_title, task_condition, student_answer]):
             return Response(
                 {'error': 'Все поля обязательны: student_name, group, task_title, task_condition, student_answer'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Промпт для AI — отзыв на задание
         prompt_review = f"""
 Ты — islam teacher ai. Твоя задача — проверить домашнее задание студента,
 ученика 9–15 лет, который только начинает учиться.
@@ -34,7 +33,6 @@ class HomeworkReviewCreateAPIView(APIView):
 Вот ответ студента: {student_answer}
 """
 
-        # Промпт для AI — определение оригинальности
         prompt_originality = f"""
 Ты — islam teacher ai. Проверь, сам ли студент (9–15 лет) написал это задание или использовал искусственный интеллект (например, ChatGPT).
 Ответь строго одним словом: "Да" — если использовал ИИ, или "Нет" — если не использовал. Никаких объяснений.
@@ -44,13 +42,10 @@ class HomeworkReviewCreateAPIView(APIView):
 Ответ студента: {str(student_answer)}
 """
 
-
-        # Отправка в AI
         ai_feedback = sent_prompt_and_get_response(prompt_review)
         originality_check = sent_prompt_and_get_response(prompt_originality)
         grade = extract_grade_from_feedback(ai_feedback)
 
-        # Подготовка данных для сериализатора
         data = {
             'student_name': student_name,
             'group': group,
@@ -67,3 +62,11 @@ class HomeworkReviewCreateAPIView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request, pk=None):
+        if pk is None:
+            return Response({'error': 'Не указан ID'}, status=status.HTTP_400_BAD_REQUEST)
+
+        result = get_object_or_404(HomeworkResult, pk=pk)
+        serializer = HomeworkResultsSerializer(result)
+        return Response(serializer.data)
